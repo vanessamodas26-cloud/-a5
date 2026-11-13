@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>site da zabella e Meu</title>
+  <title>site da isabella e Meu</title>
 </head>
 <body>
     <?php echo "<h1>Olá, mundo!</h1>" ?>
