@@ -1,39 +1,32 @@
 <?php
-//Incluindo o arquivo o arquivo de conexão nesse arquivo
 include "conecta.php";
 
-// Recebendo os dados do formulário
-$cpf = $_POST['cpf'];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
+    !isset($_POST['cpf'], $_POST['senha'])) {
+    http_response_code(400);
+    exit("Dados de login inválidos.");
+}
+
+$cpf = trim($_POST['cpf']);
 $senha = $_POST['senha'];
 
-
-<?php
-// Consulta SQL preparada (segura contra SQL Injection)
-$sql = "SELECT * FROM aluno WHERE cpf = :cpf AND senha = :senha";
+$sql = "SELECT 1 FROM aluno WHERE cpf = :cpf AND senha = :senha LIMIT 1";
 
 try {
-    // Preparando a consulta
     $stmt = $conexao->prepare($sql);
-
-    // Executando a consulta com parâmetros
     $stmt->execute([
         ':cpf' => $cpf,
         ':senha' => $senha
     ]);
 
-    // Verificando se existe um registro
-    $linha = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($linha) {
+    if ($stmt->fetchColumn() !== false) {
         echo "Login bem-sucedido!";
     } else {
         echo "CPF ou senha incorretos.";
     }
-
 } catch (PDOException $e) {
-    // Não exibir detalhes internos do banco ao usuário
-    error_log("Erro ao executar consulta: " . $e->getMessage());
-    echo "Ocorreu um erro ao realizar o login.";
+    // Registre o erro em um log no servidor, sem exibir detalhes ao usuário.
+    http_response_code(500);
+    echo "Não foi possível realizar o login.";
 }
 ?>
-
